@@ -124,7 +124,7 @@ DDMTemplate/
 
 3. **Executar no dispositivo:**
    - Escaneie o QR code com o app Expo Go
-   - Ou pressione `a` para Android / `ia` para iOS
+   - Ou pressione `a` para Android / `i` para iOS
 ---
 
 **Desenvolvido para fins educacionais** 🎓
