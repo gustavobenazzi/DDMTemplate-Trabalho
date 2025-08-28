@@ -1,26 +1,36 @@
 import { ThemedView } from '@/components/ThemedView';
 import { Button, Input } from '@/src/atoms';
 import { PrioritySelector } from '@/src/molecules';
-import { CreateTaskData, TaskPriority } from '@/src/types';
-import React, { useState } from 'react';
+import { Task, TaskPriority } from '@/src/types';
+import React, { useEffect, useState } from 'react';
 import { Alert, StyleSheet } from 'react-native';
 
 
 export interface TaskFormProps {
-  onSubmit: (taskData: CreateTaskData) => Promise<void>;
+  initialValues?: Task;
+  onSubmit: (taskData: Task) => Promise<void>;
   onSuccess?: () => void;
   isLoading?: boolean;
 }
 
 export const TaskForm: React.FC<TaskFormProps> = ({
+  initialValues,
   onSubmit,
   onSuccess,
   isLoading = false,
 }) => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [priority, setPriority] = useState<TaskPriority>('média');
+  const [title, setTitle] = useState(initialValues?.title || '');
+  const [description, setDescription] = useState(initialValues?.description || '');
+  const [priority, setPriority] = useState<TaskPriority>(initialValues?.priority || 'média');
   const [titleError, setTitleError] = useState('');
+
+  useEffect(() => {
+    if (initialValues) {
+      setTitle(initialValues.title);
+      setDescription(initialValues.description);
+      setPriority(initialValues.priority);
+    }
+  }, [initialValues]);
 
   const validateForm = (): boolean => {
     setTitleError('');
@@ -34,33 +44,38 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   };
 
   const handleSubmit = async () => {
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
+
+    const taskData: Task = {
+      ...initialValues,
+      id: initialValues?.id || String(Date.now()),
+      title: title.trim(),
+      description: description.trim(),
+      priority,
+      completed: initialValues?.completed || false,
+    };
 
     try {
-      await onSubmit({
-        title: title.trim(),
-        description: description.trim(),
-        priority,
-      });
+      await onSubmit(taskData);
 
-      // Limpar formulário após sucesso
-      setTitle('');
-      setDescription('');
-      setPriority('média');
-      
+      // Limpar formulário se não for edição
+      if (!initialValues) {
+        setTitle('');
+        setDescription('');
+        setPriority('média');
+      }
+
       onSuccess?.();
     } catch (error) {
-      console.error('Erro ao criar tarefa:', error);
-      Alert.alert('Erro', 'Não foi possível criar a tarefa. Tente novamente.');
+      console.error('Erro ao salvar tarefa:', error);
+      Alert.alert('Erro', 'Não foi possível salvar a tarefa. Tente novamente.');
     }
   };
 
   const handleClear = () => {
-    setTitle('');
-    setDescription('');
-    setPriority('média');
+    setTitle(initialValues?.title || '');
+    setDescription(initialValues?.description || '');
+    setPriority(initialValues?.priority || 'média');
     setTitleError('');
   };
 
@@ -99,9 +114,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({
           onPress={handleClear}
           style={styles.clearButton}
         />
-        
+
         <Button
-          title={isLoading ? 'Criando...' : 'Criar Tarefa'}
+          title={isLoading ? (initialValues ? 'Salvando...' : 'Criando...') : (initialValues ? 'Salvar' : 'Criar Tarefa')}
           variant="primary"
           onPress={handleSubmit}
           disabled={isLoading}
@@ -115,13 +130,13 @@ export const TaskForm: React.FC<TaskFormProps> = ({
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    paddingBottom: 100, // Espaço extra para evitar sobreposição com tabs
+    paddingBottom: 100,
   },
   actions: {
     flexDirection: 'row',
     gap: 12,
     marginTop: 24,
-    marginBottom: 20, // Margem extra
+    marginBottom: 20,
   },
   clearButton: {
     flex: 1,

@@ -1,9 +1,10 @@
-import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
-import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 import { Icon, PriorityIndicator } from '@/src/atoms';
 import { Task } from '@/src/types';
+import { useRouter } from 'expo-router';
+import React from 'react';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 
 export interface TaskItemProps {
   task: Task;
@@ -18,6 +19,8 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   onToggleComplete,
   onDelete,
 }) => {
+  const router = useRouter();
+
   return (
     <TouchableOpacity
       style={[styles.container, task.completed && styles.completedContainer]}
@@ -27,23 +30,17 @@ export const TaskItem: React.FC<TaskItemProps> = ({
         <ThemedView style={styles.mainContent}>
           <ThemedView style={styles.titleRow}>
             <ThemedText
-              style={[
-                styles.title,
-                task.completed && styles.completedText,
-              ]}
+              style={[styles.title, task.completed && styles.completedText]}
               numberOfLines={1}
             >
               {task.title}
             </ThemedText>
             <PriorityIndicator priority={task.priority} />
           </ThemedView>
-          
+
           {task.description && (
             <ThemedText
-              style={[
-                styles.description,
-                task.completed && styles.completedText,
-              ]}
+              style={[styles.description, task.completed && styles.completedText]}
               numberOfLines={2}
             >
               {task.description}
@@ -68,6 +65,26 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             onPress={() => onDelete?.(task.id)}
           >
             <Icon name="trash" size={20} color="#FF6B6B" />
+          </TouchableOpacity>
+
+          {/* Botão de detalhes */}
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() =>
+              router.push({ pathname: '/task-details', params: { id: task.id } })
+            }
+          >
+            <ThemedText>📄 Ver Detalhes</ThemedText>
+          </TouchableOpacity>
+
+          {/* Botão de editar */}
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() =>
+              router.push({ pathname: '/edit-task', params: { id: task.id } })
+            }
+          >
+            <ThemedText>✏️ Editar</ThemedText>
           </TouchableOpacity>
         </ThemedView>
       </ThemedView>
@@ -120,6 +137,7 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexWrap: 'wrap',
   },
   actionButton: {
     padding: 8,

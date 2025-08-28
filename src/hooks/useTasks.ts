@@ -89,13 +89,18 @@ export const useTasks = () => {
     return newTask;
   };
 
-  // Atualizar tarefa existente
+  // Atualizar tarefa existente -
   const updateTask = async (taskId: string, updates: UpdateTaskData): Promise<void> => {
-    setTasks(prevTasks =>
-      prevTasks.map(task =>
+    setTasks(prevTasks => {
+      const newTasks = prevTasks.map(task =>
         task.id === taskId ? { ...task, ...updates } : task
-      )
-    );
+      );
+
+      // Salvar imediatamente no AsyncStorage
+      saveTasks(newTasks);
+
+      return newTasks;
+    });
   };
 
   // Alternar status de conclusão

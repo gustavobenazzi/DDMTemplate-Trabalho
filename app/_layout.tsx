@@ -57,6 +57,7 @@ useEffect(() => {
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="task-details" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
+          <Stack.Screen name="edit-task" options={{ title: "Editar Tarefa" }} />
         </Stack>
 =======
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
