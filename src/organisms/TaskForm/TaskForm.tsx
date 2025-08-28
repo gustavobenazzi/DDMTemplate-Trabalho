@@ -5,6 +5,7 @@ import { CreateTaskData, TaskPriority } from '@/src/types';
 import React, { useState } from 'react';
 import { Alert, StyleSheet } from 'react-native';
 
+
 export interface TaskFormProps {
   onSubmit: (taskData: CreateTaskData) => Promise<void>;
   onSuccess?: () => void;
@@ -84,6 +85,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         showCharCount
         multiline
       />
+    
 
       <PrioritySelector
         selectedPriority={priority}
